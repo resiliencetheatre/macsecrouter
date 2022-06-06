@@ -8,6 +8,7 @@ To build macsec router firmware, you need to install Buildroot environment and c
 
 ```
 mkdir ~/build-directory
+cd ~/build-directory
 git clone https://git.buildroot.net/buildroot
 git clone https://github.com/resiliencetheatre/macsecrouter
 ```
