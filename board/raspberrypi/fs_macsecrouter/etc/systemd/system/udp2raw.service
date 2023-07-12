@@ -1,0 +1,15 @@
+[Unit]
+Description=udp2raw for wireguard
+After=network.target auditd.service
+Conflicts=rtptun.service 
+
+[Service]
+WorkingDirectory=/tmp
+EnvironmentFile=/opt/wgcap/wgcap_service.conf
+ExecStart=udp2raw -c -l0.0.0.0:3333 -r${SERVER_IP}:5005 -k ${UDP2RAW_PSK} --raw-mode faketcp -a
+Type=simple
+Restart=always
+RestartSec=5
+
+# [Install]
+# WantedBy=multi-user.target
