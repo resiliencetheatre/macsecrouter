@@ -1,0 +1,14 @@
+[Unit]
+Description=keymonitor-tx (socket)
+After=multi-user.target 
+Before=otp-tunnel-client.service
+
+[Service]
+WorkingDirectory=/tmp
+KillMode=process
+ExecStart=gwsocket -p 9015 --pipein=/tmp/rx-key-presentage
+Restart=always
+RestartSec=15
+TimeoutStartSec=5
+
+

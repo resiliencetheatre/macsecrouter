@@ -1,0 +1,14 @@
+[Unit]
+Description=wifi pipe monitor (script)
+After=multi-user.target wifi-pipemonitor-socket.service
+
+[Service]
+WorkingDirectory=/tmp
+KillMode=process
+ExecStartPre=mkdir /tmp/vault
+ExecStart=/usr/bin/wifi_pipemonitor.sh
+Restart=always
+RestartSec=10
+TimeoutStartSec=5
+
+

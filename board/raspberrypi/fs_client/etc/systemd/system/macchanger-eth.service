@@ -1,0 +1,10 @@
+[Unit]
+Description=macchanger ethernet service
+Before=network-pre.target
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/tmp
+ExecStart=/bin/macchanger -r eth0
+RemainAfterExit=true

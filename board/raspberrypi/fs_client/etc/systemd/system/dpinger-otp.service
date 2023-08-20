@@ -1,0 +1,12 @@
+[Unit]
+Description=dpinger-otp
+After=multi-user.target dpinger-otp-socket.service sys-devices-virtual-net-tun0.device sys-devices-virtual-net-wg0.device
+
+[Service]
+Type=forking
+WorkingDirectory=/tmp
+KillMode=process
+ExecStart=/bin/dpinger -s 10s -r 10s -t 120s -i ot -o /tmp/dpinger-otp-socket 10.10.0.1
+Restart=always
+RestartSec=10
+TimeoutStartSec=5

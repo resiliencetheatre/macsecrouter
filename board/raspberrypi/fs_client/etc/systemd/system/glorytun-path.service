@@ -1,0 +1,14 @@
+[Unit]
+Description=Glorytun path #3
+After=glorytun-ip.service sys-devices-virtual-net-tun1.device
+
+[Service]
+Type=simple
+EnvironmentFile=/opt/tunnel/glorytun.env
+WorkingDirectory=/opt/tunnel
+ExecStartPre=/bin/sh -c "systemctl set-environment HOST_IP=$(ip -o r get 8.8.8.8 | awk '{ print $7 }')"
+ExecStart=/bin/glorytun path up ${HOST_IP} rate tx ${TX_BW} rx ${RX_BW}
+ExecStartPost=/sbin/ip r a 10.0.0.0/24 via ${REMOTE_IP}
+CapabilityBoundingSet=CAP_NET_ADMIN
+
+

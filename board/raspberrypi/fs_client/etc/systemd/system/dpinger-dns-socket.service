@@ -1,0 +1,15 @@
+[Unit]
+Description=dpinger-dns (socket)
+After=multi-user.target network-online.target
+Before=dpinger-dns.service
+Requires=dpinger-dns.service
+
+[Service]
+WorkingDirectory=/tmp
+KillMode=process
+ExecStart=gwsocket -p 9005 --pipein=/tmp/dpinger-dns-socket
+Restart=always
+RestartSec=15
+TimeoutStartSec=5
+
+

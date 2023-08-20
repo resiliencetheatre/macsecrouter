@@ -1,0 +1,13 @@
+[Unit]
+Description=Glorytun IP #2
+Requires=sys-devices-virtual-net-tun1.device
+After=glorytun.service sys-devices-virtual-net-tun1.device
+
+[Service]
+Type=simple
+EnvironmentFile=/opt/tunnel/glorytun.env
+WorkingDirectory=/opt/tunnel
+ExecStart=/usr/sbin/ip address add local ${LOCAL_IP} remote ${REMOTE_IP} dev ${TUN_INTERFACE} 
+CapabilityBoundingSet=CAP_NET_ADMIN
+
+

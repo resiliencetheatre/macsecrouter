@@ -1,0 +1,15 @@
+[Unit]
+Description=wifi-pipemonitor (socket)
+After=multi-user.target
+Before=wifi-pipemonitor.service
+Requires=wifi-pipemonitor.service
+
+[Service]
+WorkingDirectory=/tmp
+KillMode=process
+ExecStart=gwsocket -p 9050 --pipein=/tmp/wificontrolin --pipeout=/tmp/wificontrolout
+Restart=always
+RestartSec=15
+TimeoutStartSec=5
+
+

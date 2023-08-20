@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>OTP Router</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+<script src="js/chart.js"></script>
+<script src="js/feather.js" ></script>
+<link href="css/communit.css" rel="stylesheet" />
+<link href="css/w3.css" rel="stylesheet" />
+</head>
+
+<body>
+	<div class="grid-container">
+		<div class="grid-item">
+		<h3>OTP Router</h3>
+		<p>Connection latency:</p>
+		<center>
+			<table border=0 width=100%>
+				<tr>
+					<td></td><td></td><td width=45%><span id="dnsSocketStatusInGraph"></span></td>
+				</tr>
+			</table>			
+			<img src="img/conn.png" width=300px;>
+			<table border=0 width=100%>
+				<tr>
+					<td></td><td><center><span id="socketStatusInGraph"></span></center></td><td></td>
+				</tr>
+			</table>	
+		</center>	
+	</div>
+
+	<div class="grid-item">
+		<p><h4><span id="systemMessagesStatus"></span> System log</h4></p>
+		<div id="systemMessages" class="systemMsgView" ></div>
+	</div>
+	
+	<div class="grid-item">
+		<p><h4><span id="otpsocketStatus"></span><span id="socketStatus"></span> Network status for OTP endpoint:</h4></p>
+		<span id="socketData"></span><span id="otpsocketData"></span>
+		<canvas id="otpChart" style="border: 0px solid black; width:60%; height:150px;"></canvas>	
+	</div>
+	
+  <div class="grid-item">
+	<p><h4><span id="dnsSocketStatus"></span> Network status for Internet:</h4></p>
+	<span id="dnsSocketData"></span>
+	<canvas id="dnsChart" style="border: 0px solid black; width:60%; height:150px;"></canvas>	
+  </div>
+  
+  <div class="grid-item">
+	<p><h4><span id="txKeyUsagesocketStatus"></span> OTP Key consumption (transmit)</h4></p>
+	 <span id="txKeyUsagesocketData"></span>
+	<center>
+	<canvas id="txKeyUsage" style="border: 0px solid black; width:100%;max-height:200px"></canvas>			
+	</center>
+  </div>
+  <div class="grid-item">
+	<p><h4><span id="rxKeyUsagesocketStatus"></span> OTP Key consumption (receive)</h4></p>
+	<span id="rxKeyUsagesocketData"></span>
+	<center>
+	<canvas id="rxKeyUsage" style="border: 0px solid black; width:100%;max-height:200px"></canvas>			
+	</center>
+  </div>
+
+
+
+	<div class="grid-item">
+		<h4><span id="wifiControlSocketStatus"></span> Wifi connect</h4>
+		<p>Scan and connect Wifi. Wifi can be used to Internet connectivity.</p>
+				
+			<div class="w3-container">
+				<input type="button" class="w3-btn w3-green" value="Scan networks" onclick="scanNetworks()">
+			</div>
+			<p>
+			Select network and give network password:
+			<div class="w3-container">
+					
+				<select name="ssid" id="ssid"></select>
+				
+				<input type="text" id="password" name="password" value="">
+				<input type="button" class="w3-btn w3-green" value="Connect" onclick="connectWifiNetwork()">		
+				<input type="button" class="w3-btn w3-red" value="Forget" onclick="forgetWifiNetwork()">
+				
+				<p></p>
+				<span id="wifiControlSocketData"></span>
+				
+			</div>
+		
+		<!--
+			<label class="container">Stop automatically after 5 minutes (300 s)
+				<input id="autoCountdown" type="checkbox" checked="checked">
+				<span class="checkmark"></span>
+			</label>
+		-->	
+	</div>
+
+
+
+	<div class="grid-item">
+		<h4>Interface addresses</h4>
+		<p>Device connectivity addresses:</p>
+				
+			<div class="w3-container">
+				<center>
+				<table width=90% border=0 >
+				<tr>
+				<td width=33% valign="top"><b>Wifi:</b><span id="wifiIp"></span><p><span id="wifiDetails"></span></p></td><td valign="top" width=33%><b><center>enp1s0u3</center></b></td><td valign="top" width=33%><b>eth0</b><span id="ethIp"></span></td>
+				</tr>
+				</table>
+				
+				<img src="img/interfaces-ui.png" width=200px;>
+				</center>
+			
+			</div>
+			
+	</div>
+
+
+
+
+
+<!--
+	<div class="grid-item">
+		<h3><span id="audioControlSocketStatus"></span> Control audio transmission</h3>
+		<p>This section controls actual full duplex audio link.<br> Every second link is active, OTP key material is consumed.</p>
+		<span id="audioControlSocketData"></span>
+		<p></p>
+		<center>
+			<div class="w3-container">
+				<input type="button" class="w3-btn w3-green" value="Audio On" onclick="audioOn()">
+				<input type="button" class="w3-btn w3-red" value="Audio Off" onclick="audioOff()">
+			</div>
+		</center>
+		<p></p>
+		
+		<div class="w3-light-grey"> 
+			<div id="myBar" class="w3-container w3-green" style="height:20px;width:0%"><span id="timeoutCount"></span></div>
+		</div>
+		
+		<p></p>
+			<label class="container">Stop automatically after 5 minutes (300 s)
+				<input id="autoCountdown" type="checkbox" checked="checked">
+				<span class="checkmark"></span>
+			</label>
+			
+		Audio volume:
+		<div class="slidecontainer" >
+			<input type="range" min="0" max="100" value="1" class="slider" id="myRange" oninput="updateVolume(this.value)" >
+		</div>
+	</div>
+	
+	<div class="grid-item">	
+		<p><h4><span id="msgChannelSocketStatus"></span> Messaging</h4></p>
+		<div id="msgChannelLog" class="incomingMsg" ></div>
+		<p></p>
+		<input type="text" id="msgInput" class="msgTextInput" type="text" style="width: 43%" >
+		<input id="sendMsg"  type="button" class="w3-btn w3-green" value="Send" >
+	</div>
+-->	
+
+</div> 
+
+
+
+<script type='text/javascript'>
+	// graph.js variables for packetgraph.js
+	var xIndex=0;
+	var xValues = [0,1,2,3,4,5,6,7,8,9,10];
+	var latencyValues = [];
+	var packetLossValues = [];
+		var otplatencyValues = [];
+		var otppacketLossValues = [];
+	var dnsXindex=0;
+	var dnsXvalues = [0,1,2,3,4,5,6,7,8,9,10];
+	var dnsLatencyValues = [];
+	var dnsPacketLossValues = [];
+	var key_xIndex=0;
+	var key_xValues = [0,1,2,3,4,5,6,7,8,9,10];
+	var key_persentage = [];
+	var rx_key_xIndex=0;
+	var rx_key_xValues = [0,1,2,3,4,5,6,7,8,9,10];
+	var rx_key_persentage = [];
+	//
+	var audioControlSocket;
+</script>
+<script src="js/packetgraph.js" ></script>
+
+
+<script>	
+// https://stackoverflow.com/questions/436411/where-should-i-put-script-tags-in-html-markup
+
+var idCountdown;
+// myBar.className = "w3-container w3-red";
+feather.replace();
+
+
+
+
+function audioOn() {
+	var elem = document.getElementById("myBar");
+	var existingWidth = elem.style.width;
+	var existingWidthValue = existingWidth.slice(0, -1) 
+	var width = existingWidthValue;
+	var id = setInterval(frame, 10);
+	clearInterval(idCountdown);  
+	myBar.className = "w3-container w3-green";
+	// Visually count up
+	function frame() {
+		if (width >= 100) {
+			clearInterval(id);
+		} else {
+			width++;
+			
+			if ( autoCountdown.checked ) {
+				elem.style.width = width + '%';
+				$('#timeoutCount').innerHTML = 3 * width + ' s';
+			} else {
+				elem.style.width = width + '%';
+				$('#timeoutCount').innerHTML = "automatic stop disabled";
+			}
+		}
+	}
+	audioControlSocket.send("audio-on\n");
+	logMessage("Audio transmission started");
+	
+	// Automatic count down timer
+	if ( autoCountdown.checked ) {
+		idCountdown = setInterval(countDownframe, 3000);  
+		function countDownframe() {
+			if (width == 0) {
+				clearInterval(idCountdown);
+				elem.style.width = '0%';
+				audioControlSocket.send("audio-off\n");
+				logMessage("Audio transmission stopped after timeout");
+				console.log("countDownframe() 2", elem.style.width);
+				myBar.className = "w3-container w3-red";
+			} else {
+				width--;
+				elem.style.width = width + '%';
+				console.log("countDownframe() 1", elem.style.width);
+				$('#timeoutCount').innerHTML =   3 * width + ' s';
+			}
+		}
+	} 
+  
+}
+function audioOff() {
+	var elem = document.getElementById("myBar");
+	var existingWidth = elem.style.width;
+	var existingWidthValue = existingWidth.slice(0, -1) 
+	var width = existingWidthValue;
+	var id = setInterval(frame, 10);
+	function frame() {
+		if (width == 0) {
+			clearInterval(id);
+			clearInterval(idCountdown);
+			elem.style.width = '0%';
+			myBar.className = "w3-container w3-red";
+		} else {
+			width--;
+			elem.style.width = width + '%';
+			$('#timeoutCount').innerHTML = 3 * width + ' s';
+		}
+	}
+	audioControlSocket.send("audio-off\n");
+	logMessage("Audio transmission stopped");
+}
+
+function updateVolume(value) {
+	audioControlSocket.send("Volume: " + value + "\n");
+}
+
+
+function getTime() {
+	var today = new Date();
+	var hours =  today.getHours() ;
+	var minutes =  today.getMinutes() ;
+	var seconds =  today.getSeconds() ;
+	if ( today.getHours() < 10 ) { hours = "0"+today.getHours();}
+	if ( today.getMinutes() < 10 ) { minutes = "0"+today.getMinutes();}
+	if ( today.getSeconds() < 10 ) { seconds = "0"+today.getSeconds();}
+	var time = hours+ ":" + minutes + ":" + seconds;
+	return time;
+}
+
+function logMessage(message) {
+	console.log("Logging: ", message);
+	$('#systemMessages').innerHTML += message + "<br>";
+}
+
+function removeOptions(selectElement) {
+   var i, L = selectElement.options.length - 1;
+   for(i = L; i >= 0; i--) {
+      selectElement.remove(i);
+   }
+}
+
+function scanNetworks() {
+	removeOptions(document.getElementById('ssid'));
+	wifiControlSocket.send("wifiscan\n");
+	logMessage("Scanning networks...");
+	$('#wifiControlSocketData').innerHTML = "Scanning networks..."
+}
+
+function connectWifiNetwork() {
+	// password & ssid	
+	var ssid_select = document.getElementById('ssid');
+	var network_ssid = ssid_select.options[ssid_select.selectedIndex].text;
+	var network_password = document.getElementById('password').value ;
+	document.getElementById('password').value = "";
+	$('#wifiControlSocketData').innerHTML = "Connecting..."
+	logMessage("Connecting to " +  network_ssid);
+	wifiControlSocket.send("wificonnect," + network_ssid + "," + network_password + "\n");
+}
+
+function forgetWifiNetwork() {
+	var ssid_select = document.getElementById('ssid');
+	var network_ssid = ssid_select.options[ssid_select.selectedIndex].text;
+	document.getElementById('password').value = "";
+	$('#wifiControlSocketData').innerHTML = "Forgetting..."
+	logMessage("Forgetting " +  network_ssid);
+	wifiControlSocket.send("wififorget," + network_ssid + "\n");
+}
+
+function getipaddresses() {
+	wifiControlSocket.send("getips\n");
+}
+
+function getwlanstatus() {
+	wifiControlSocket.send("wlanstatus\n");
+}
+
+
+
+	
+function $(selector) {
+	return document.querySelector(selector);
+}
+	//
+	// Websocket protocol and host for sockets bellow
+	//
+	var wsProtocol = null;
+	if(window.location.protocol === 'http:')
+			wsProtocol = "ws://";
+	else
+			wsProtocol = "wss://";
+	
+	var wsHost = location.host;
+	// var wsHost = "192.168.5.57";
+	// console.log("wsProtocol: " + wsProtocol + " wsHost: " + wsHost );
+
+	var otptunnel_latency;
+	var otptunnel_packetloss;
+	
+	//
+	// Socket for packet loss and latency for OTP end point
+	//
+	var socket = new WebSocket(wsProtocol+wsHost+':9000');
+	socket.onopen = function(event) {
+		$('#socketStatus').innerHTML = '<span style="color: green">█</span>';
+		$('#socketData').innerHTML = '[waiting data]';
+		logMessage("OTP end point monitoring connected");
+	};
+	socket.onmessage = function(event) {
+		var incomingMessage = event.data;
+		// console.log("9000 message:" + incomingMessage );
+		// return;
+		var trimmedString = incomingMessage.substring(0, 80);
+		const dataArray = trimmedString.split(" ");
+		// console.log( dataArray[0], dataArray[1], dataArray[2], dataArray[3] ); 
+		var pingTarget = dataArray[0];
+		var latency = dataArray[1]/1000;
+		var packetLoss = dataArray[3];
+		var packetLossString = packetLoss.toString();
+		var truncatedPacketLoss = packetLossString.substring(0,3);
+		var latencyString = latency.toString();
+		var truncatedLatency = latencyString.substring(0,5);
+		$('#socketData').innerHTML = "<b>OTP endpoint packet loss:</b> " + truncatedPacketLoss + " % <b>Latency:</b> " + truncatedLatency + " ms";
+		if ( packetLoss == 100 ) {
+			$('#socketStatusInGraph').innerHTML = "<font color='red'>OTP device unreachable</font>";
+		} else {
+			if ( packetLoss > 5 && packetLoss < 100 ) {
+				$('#socketStatusInGraph').innerHTML = "<b>Packet loss:</b><font color='red'> " + truncatedPacketLoss + " % </font><b>Latency:</b> " + truncatedLatency + " ms";
+			} else {
+				$('#socketStatusInGraph').innerHTML = "<b>Packet loss:</b> " + truncatedPacketLoss + " % <b>Latency:</b> " + truncatedLatency + " ms";			
+			}
+		}
+		myLineChart.data.labels[xIndex] = getTime(); 
+		myLineChart.data.datasets[0].data[xIndex] = latency;
+		myLineChart.data.datasets[1].data[xIndex] = packetLoss;
+		
+			// Default to 0 if undef
+			if ( otptunnel_latency == null ){
+				otptunnel_latency = 0; 
+				otptunnel_packetloss = 0;
+			}
+			myLineChart.data.datasets[2].data[xIndex] = otptunnel_latency;
+			myLineChart.data.datasets[3].data[xIndex] = otptunnel_packetloss;
+		
+		
+		xIndex++;
+		myLineChart.update();
+		// test if undef
+		// if ( otptunnel_latency != null ){
+		// 	console.log("Global variables: " + otptunnel_latency + " " + otptunnel_packetloss);	
+		// }
+	};
+	
+	socket.onclose = function(event) {
+		$('#socketStatus').innerHTML = '<span style="color: red">█</span>' + event.reason;	
+	};
+	
+	// 
+	// Socket for inside OTP tunnel packetloss and latency WIP
+	// 
+	var otpsocket = new WebSocket(wsProtocol+wsHost+':9060');
+	otpsocket.onopen = function(event) {
+		$('#otpsocketStatus').innerHTML = '<span style="color: green">█</span>';
+		logMessage("OTP tunnel monitoring connected");
+	};
+	
+	otpsocket.onmessage = function(event) {
+		var incomingMessage = event.data;
+		var trimmedString = incomingMessage.substring(0, 80);
+		const dataArray = trimmedString.split(" ");
+		var pingTarget = dataArray[0];
+		var latency = dataArray[1]/1000;
+		var packetLoss = dataArray[3];
+		var packetLossString = packetLoss.toString();
+		var truncatedPacketLoss = packetLossString.substring(0,3);
+		var latencyString = latency.toString();
+		var truncatedLatency = latencyString.substring(0,5);
+		$('#otpsocketData').innerHTML = " <b>OTP Tunnel packet loss:</b> " + truncatedPacketLoss + " % <b>Latency:</b> " + truncatedLatency + " ms";
+		// Global variables
+		otptunnel_latency = latency;
+	    otptunnel_packetloss = packetLoss;
+	};
+	
+	otpsocket.onclose = function(event) {
+		$('#otpsocketStatus').innerHTML = '<span style="color: red">█</span>' + event.reason;	
+	};
+	
+	
+	
+	
+	
+	
+	
+	
+	//
+	// Socket for packet loss and latency for DNS end point
+	//
+	var dnsSocket = new WebSocket(wsProtocol+wsHost+':9005');
+	dnsSocket.onopen = function(event) {
+		$('#dnsSocketStatus').innerHTML = '<span style="color: green">█</span>';
+		$('#dnsSocketData').innerHTML = '[waiting data]';
+		logMessage("DNS end point monitoring connected");
+	};
+	dnsSocket.onmessage = function(event) {
+		var dnsIncomingMessage = event.data;
+
+		// console.log("dnsIncomingMessage: " + dnsIncomingMessage);
+
+		var dnsTrimmedString = dnsIncomingMessage.substring(0, 80);
+		const dnsDataArray = dnsTrimmedString.split(" ");
+		var dnsPingTarget = dnsDataArray[0];
+		var dnsLatency = dnsDataArray[1]/1000;
+		var dnsPacketLoss = dnsDataArray[3];
+		var dnsPacketLossString = dnsPacketLoss.toString();
+		var dnsTruncatedPacketLoss = dnsPacketLossString.substring(0,3);
+		var dnsLatencyString = dnsLatency.toString();
+		var dnsTruncatedLatency = dnsLatencyString.substring(0,5);
+		$('#dnsSocketData').innerHTML = "<b>Packet loss:</b> " + dnsTruncatedPacketLoss + " % <b>Latency:</b> " + dnsTruncatedLatency + " ms";
+		if ( dnsPacketLoss == 100 ) {
+			$('#dnsSocketStatusInGraph').innerHTML = "<font color='red'>No Internet</font>";
+		} else {
+			if ( dnsPacketLoss > 5 && dnsPacketLoss < 100 ) {
+				$('#dnsSocketStatusInGraph').innerHTML = "<b>Packet loss:</b><font color='red'>  " + dnsTruncatedPacketLoss + " % </font><br><b>Latency:</b> " + dnsTruncatedLatency + " ms";
+			} else {
+				$('#dnsSocketStatusInGraph').innerHTML = "<b>Packet loss:</b> " + dnsTruncatedPacketLoss + " % <br><b>Latency:</b> " + dnsTruncatedLatency + " ms";
+			}
+		}	
+		dnsLineChart.data.labels[dnsXindex] = getTime(); 
+		dnsLineChart.data.datasets[0].data[dnsXindex] = dnsLatency;
+		dnsLineChart.data.datasets[1].data[dnsXindex] = dnsPacketLoss;
+		dnsXindex++;
+		dnsLineChart.update();		
+	};
+	
+	dnsSocket.onclose = function(event) {
+		$('#dnsSocketStatus').innerHTML = '<span style="color: red">█</span>' + event.reason;	
+	};
+	//
+	// Socket for TX key usage
+	//
+	var txKeyUsagesocket = new WebSocket(wsProtocol+wsHost+':9010');
+	txKeyUsagesocket.onopen = function(event) {
+		$('#txKeyUsagesocketStatus').innerHTML = '<span style="color: green">█</span>';
+		$('#txKeyUsagesocketData').innerHTML = '[waiting data]';
+	};
+	txKeyUsagesocket.onmessage = function(event) {
+		var incomingMessage = event.data;
+		var trimmedString = incomingMessage.substring(0, 80);
+		/*const dataArray = trimmedString.split(" ");
+		var latency = dataArray[1]/1000;
+		var packetLoss = dataArray[3];*/
+		const presentageValue = trimmedString.substring(0, trimmedString.length - 2);
+		var remainingKey=String(100-presentageValue);
+		var truncatedRemainingKey = remainingKey.substring(0,6);
+		$('#txKeyUsagesocketData').innerHTML = "TX key remaining: " + truncatedRemainingKey + " %";
+		logMessage("TX key remaining: " + truncatedRemainingKey + " %");
+		keyUsageChart.data.datasets[0].data[0] = remainingKey;
+		keyUsageChart.data.datasets[0].data[1] = presentageValue;
+		keyUsageChart.update();
+		key_xIndex++;
+	};
+	txKeyUsagesocket.onclose = function(event) {
+		$('#txKeyUsagesocketStatus').innerHTML = '<span style="color: red">█</span> ' + event.reason;	
+	};
+	//
+	// Socket for RX key usage (pie)
+	//
+	var rxKeyUsagesocket = new WebSocket(wsProtocol+wsHost+':9015');
+	rxKeyUsagesocket.onopen = function(event) {
+		$('#rxKeyUsagesocketStatus').innerHTML = '<span style="color: green">█</span>';
+		$('#rxKeyUsagesocketData').innerHTML = '[waiting data]';
+	};
+	rxKeyUsagesocket.onmessage = function(event) {
+		var incomingMessage = event.data;
+		var trimmedString = incomingMessage.substring(0, 80);
+		const presentageValue = trimmedString.substring(0, trimmedString.length - 2);
+		var remainingKey = String(100-presentageValue);
+		var truncatedRemainingKey = remainingKey.substring(0,6);
+		$('#rxKeyUsagesocketData').innerHTML = "RX key remaining: " + truncatedRemainingKey + " %";
+		logMessage("RX key remaining: " + truncatedRemainingKey + " %");
+		rxKeyUsageChart.data.datasets[0].data[0] = remainingKey;
+		rxKeyUsageChart.data.datasets[0].data[1] = presentageValue;
+		rxKeyUsageChart.update();
+		rx_key_xIndex++;
+	};
+	rxKeyUsagesocket.onclose = function(event) {
+		$('#rxKeyUsagesocketStatus').innerHTML = '<span style="color: red">█</span> ' + event.reason;	
+	};
+	//
+	// Socket for message log (9020) /tmp/logresponses
+	//
+	var logMsgSocket = new WebSocket(wsProtocol+wsHost+':9020');
+	logMsgSocket.onopen = function(event) {
+		$('#systemMessagesStatus').innerHTML = '<span style="color: green">█</span>';
+		// $('#systemMessages').innerHTML = '[waiting data]';
+	};
+	logMsgSocket.onmessage = function(event) {
+		var incomingMessage = event.data;
+		var trimmedString = incomingMessage.substring(0, 80);
+		$('#systemMessages').innerHTML = trimmedString;
+		logMsgSocket.send("ack");
+		
+		
+	};
+	logMsgSocket.onclose = function(event) {
+		$('#systemMessagesStatus').innerHTML = '<span style="color: red">█</span> ' + event.reason;	
+	};
+	
+	//
+	// Wifi control socket (9050)
+	//
+	wifiControlSocket = new WebSocket(wsProtocol+wsHost+':9050');
+	wifiControlSocket.onopen = function(event) {
+		$('#wifiControlSocketStatus').innerHTML = '<span style="color: green">█</span>';
+		$('#wifiControlSocketData').innerHTML = '[waiting data]';
+	};
+	wifiControlSocket.onmessage = function(event) {
+		var incomingMessage = event.data;
+		var trimmedString = incomingMessage.substring(0, 200);		
+		let prefixArray = trimmedString.split(';');
+		
+		// Update network dropdown when prefix is 'visiblenetworks'
+		if (  prefixArray[0] === "visiblenetworks" ) {
+			$('#wifiControlSocketData').innerHTML = "Scan completed!"
+			logMessage("Scan completed" );
+			let networksString = prefixArray[1];
+			console.log("networksString: " + networksString);
+			let networksArray = networksString.split(' ');
+			let selectTag = document.getElementById('ssid');
+			networksArray.forEach((element, index) => {
+				let option_elem = document.createElement('option');
+				option_elem.value = index;
+				option_elem.textContent = element;
+				if ( index > 0 ) {
+					selectTag.appendChild(option_elem);
+				}
+			});	
+			// DEBUG
+			// getipaddresses();
+		}
+		if (  prefixArray[0] === "connectstatus" ) {
+			logMessage("Connect completed" );
+			$('#wifiControlSocketData').innerHTML = "Connect completed " + prefixArray[1]
+			getipaddresses();
+		}
+		if (  prefixArray[0] === "forgotnetwork" ) {
+			logMessage("Network removed" );
+			$('#wifiControlSocketData').innerHTML = "Network removed."
+		}
+		if (  prefixArray[0] === "ipaddresses" ) {
+			logMessage("Updating IP addresses" );
+			let ipaddresslist = prefixArray[1];
+			let addressArray = ipaddresslist.split(',');
+			$('#wifiControlSocketData').innerHTML = addressArray
+			$('#wifiIp').innerHTML = " " + addressArray[1];
+			$('#ethIp').innerHTML = " " + addressArray[3];
+			// 
+		}
+		if (  prefixArray[0] === "wlanstatus" ) { 
+			let wlanstatus = prefixArray[1];
+			logMessage("Updating WIFi status" );
+			$('#wifiDetails').innerHTML = wlanstatus;
+		}
+
+	};
+	wifiControlSocket.onclose = function(event) {
+		$('#wifiControlSocketStatus').innerHTML = '<span style="color: red">█</span> ' + event.reason;	
+	};
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	 
+	
+	
+	
+	//
+	// Audiocontrol Socket (9025) 
+	//
+	// Ack responses so backend could see if browser is active?
+	//
+	/*
+	audioControlSocket = new WebSocket(wsProtocol+wsHost+':9025');
+	audioControlSocket.onopen = function(event) {
+		$('#audioControlSocketStatus').innerHTML = '<span style="color: green">█</span>';
+		$('#audioControlSocketData').innerHTML = '[waiting data]';
+	};
+	audioControlSocket.onmessage = function(event) {
+		var incomingMessage = event.data;
+		var trimmedString = incomingMessage.substring(0, 80);
+		$('#audioControlSocketData').innerHTML = trimmedString;
+	};
+	audioControlSocket.onclose = function(event) {
+		$('#audioControlSocketStatus').innerHTML = '<span style="color: red">█</span> ' + event.reason;	
+	};
+	*/
+	//
+	// gwsocket -p 7990 --pipein=/tmp/msgchannel --pipeout=/tmp/msgincoming
+	//
+	// TODO: Web UI elements missing
+	// msgChannelSocketStatus msgChannelSocketData
+	//
+	/* 
+	var messageSocket = new WebSocket(wsProtocol+wsHost+':7990');
+	messageSocket.onopen = function(event) {
+		$('#msgChannelSocketStatus').innerHTML = '<span style="color: green">█</span>';
+		
+	};
+	messageSocket.onmessage = function(event) {
+		var incomingMessage = event.data;
+		var trimmedString = incomingMessage.substring(0, 80);
+		// $('#systemMessages').innerHTML = trimmedString;
+		// logMsgSocket.send("ack");
+		
+		$('#msgChannelLog').innerHTML += trimmedString;
+		$('#msgChannelLog').innerHTML += "<br>";
+		var scrollElement = document.getElementById('msgChannelLog');
+		scrollElement.scrollTop = scrollElement.scrollHeight;
+	
+	};*/
+	
+		/* 	msgSocket outgoing 
+		var input = document.getElementById("msgInput");
+		input.addEventListener("keyup", function(event) {
+			if (event.keyCode === 13) {
+				event.preventDefault();
+				document.getElementById("sendMsg").click();
+			}
+		}); 
+		$('#sendMsg').onclick = function(e) {
+			var msgPayload = $('#msgInput').value + '\n';
+			messageSocket.send( msgPayload );
+			// $('#msgChannelLog').innerHTML += msgPayload  + '<br>';
+			$('#msgInput').value = '';
+			var scrollElement = document.getElementById('msgChannelLog');
+			scrollElement.scrollTop = scrollElement.scrollHeight;	
+		};
+	*/
+	
+	/*
+	messageSocket.onclose = function(event) {
+		$('#msgChannelSocketStatus').innerHTML = '<span style="color: red">█</span> ' + event.reason;	
+	};
+	*/
+	
+	logMessage("loaded");
+	
+	setTimeout(function(){
+		getipaddresses();
+		getwlanstatus();
+	}, 3000);
+</script>
+<center><p style="color:white"> 	&#169; Resilience Theatre 2023 </p> </center>
+
+</body>
+</html>

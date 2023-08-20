@@ -1,0 +1,14 @@
+[Unit]
+Description=otp tunnel client
+After=network-online.target multi-user.target sys-devices-virtual-net-wg0.device
+Wants=network-online.target 
+Requires=sys-devices-virtual-net-wg0.device
+
+[Service]
+WorkingDirectory=/opt/tunnel/
+KillMode=process
+ExecStart=/bin/client -i /opt/tunnel/client.ini
+Restart=always
+RestartSec=5
+TimeoutStartSec=5
+

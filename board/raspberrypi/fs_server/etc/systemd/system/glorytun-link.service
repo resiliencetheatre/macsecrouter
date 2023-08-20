@@ -1,0 +1,13 @@
+[Unit]
+Description=Glorytun link #4
+After=glorytun-path.service sys-devices-virtual-net-tun1.device
+
+[Service]
+Type=simple
+EnvironmentFile=/opt/tunnel/glorytun.env
+WorkingDirectory=/opt/tunnel
+ExecStart=/usr/sbin/ip link set dev ${TUN_INTERFACE} up
+#ExecStartPost=/bin/sh -c "/opt/glorytun/setroute.sh"
+CapabilityBoundingSet=CAP_NET_ADMIN
+
+

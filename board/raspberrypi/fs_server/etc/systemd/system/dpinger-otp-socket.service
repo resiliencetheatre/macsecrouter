@@ -1,0 +1,14 @@
+[Unit]
+Description=dpinger-otp (socket)
+After=multi-user.target otp-tunnel-client.service sys-devices-virtual-net-tun0.device sys-devices-virtual-net-wg0.device
+Before=dpinger-otp.service
+Requires=dpinger-otp.service
+
+[Service]
+WorkingDirectory=/tmp
+KillMode=process
+ExecStart=gwsocket -p 9060 --pipein=/tmp/dpinger-otp-socket
+Restart=always
+RestartSec=15
+TimeoutStartSec=5
+

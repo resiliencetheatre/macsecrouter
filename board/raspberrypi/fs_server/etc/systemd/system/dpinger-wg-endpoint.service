@@ -1,0 +1,14 @@
+[Unit]
+Description=dpinger for wg0 endpoint (dpinger-wg-endpoint)
+After=dpinger-wg-endpoint-socket.service multi-user.target sys-devices-virtual-net-wg0.device
+# Requires=sys-devices-virtual-net-wg0.device 
+
+[Service]
+Type=forking
+WorkingDirectory=/tmp
+KillMode=process
+# ExecStartPre=sleep 5
+ExecStart=/bin/dpinger -r 10s -o /tmp/dpinger-wg-endpoint-socket -L 10 -i otp -t 15s  10.0.0.101
+Restart=always
+RestartSec=10
+TimeoutStartSec=5

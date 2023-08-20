@@ -1,0 +1,14 @@
+[Unit]
+Description=Glorytun route
+After=glorytun-link.service
+Wants=glorytun-ip.service glorytun-path.service glorytun-link.service
+
+[Service]
+Type=simple
+EnvironmentFile=/opt/tunnel/glorytun.env
+WorkingDirectory=/opt/tunnel
+ExecStartPre=sleep 2
+ExecStart=/sbin/ip r a 10.0.0.0/24 via ${REMOTE_IP}
+CapabilityBoundingSet=CAP_NET_ADMIN
+
+

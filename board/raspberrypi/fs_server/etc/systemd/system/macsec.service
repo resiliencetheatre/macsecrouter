@@ -1,0 +1,9 @@
+[Unit]
+Description=macsec networking
+After=multi-user.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/tunnel/network-configurations
+ExecStart=/opt/tunnel/network-configurations/macsec.sh
+RemainAfterExit=true

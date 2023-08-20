@@ -1,0 +1,8 @@
+[Unit]
+Description=Firstboot service
+After=multi-user.target vault.service             
+
+[Service]   
+Type=oneshot
+RemainAfterExit=true   
+ExecStart=sh -c /bin/firstboot.sh

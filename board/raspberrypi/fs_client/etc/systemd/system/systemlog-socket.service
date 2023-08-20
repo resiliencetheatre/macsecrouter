@@ -1,0 +1,13 @@
+[Unit]
+Description=systemlog (socket)
+After=multi-user.target
+
+[Service]
+WorkingDirectory=/tmp
+KillMode=process
+ExecStart=gwsocket -p 9020 --pipein=/tmp/logmessages
+Restart=always
+RestartSec=15
+TimeoutStartSec=5
+
+

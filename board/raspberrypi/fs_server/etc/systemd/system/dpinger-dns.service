@@ -1,0 +1,15 @@
+[Unit]
+Description=dpinger-dns
+After=dpinger-dns-socket.service multi-user.target
+# Requires=ws-dnsdatasocket.service
+
+[Service]
+WorkingDirectory=/tmp
+KillMode=process
+Type=forking
+# ExecStartPre=sleep 5
+ExecStart=/bin/dpinger -r 10s -o /tmp/dpinger-dns-socket -i dns -t 15s 1.1.1.1
+Restart=always
+RestartSec=10
+TimeoutStartSec=5
+

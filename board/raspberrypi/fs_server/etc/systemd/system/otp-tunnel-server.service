@@ -1,0 +1,12 @@
+[Unit]
+Description=udptunnel server
+After=multi-user.target
+
+[Service]
+WorkingDirectory=/opt/tunnel/
+KillMode=process
+ExecStart=server -i server.ini
+Restart=always
+RestartSec=5
+TimeoutStartSec=5
+

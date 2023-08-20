@@ -1,0 +1,15 @@
+[Unit]
+Description=dpinger-wg-endpoint (socket)
+After=multi-user.target sys-devices-virtual-net-wg0.device
+Before=dpinger-wg-endpoint.service
+Requires=dpinger-wg-endpoint.service
+
+[Service]
+WorkingDirectory=/tmp
+KillMode=process
+ExecStart=gwsocket -p 9000 --pipein=/tmp/dpinger-wg-endpoint-socket
+Restart=always
+RestartSec=15
+TimeoutStartSec=5
+
+

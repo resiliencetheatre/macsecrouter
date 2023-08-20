@@ -1,0 +1,4 @@
+/dev/root / auto rw 0 1
+/dev/sda1 /mnt/usba auto rw,defaults,x-systemd.automount,x-systemd.device-timeout=5,noatime,noauto 0 2
+# /dev/sdb1 /mnt/usbb auto rw,defaults,x-systemd.automount,x-systemd.device-timeout=5,noatime,noauto 0 2
+
